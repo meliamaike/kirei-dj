@@ -1,3 +1,16 @@
 from django.db import models
+from services import Service
+"""
+Modelo "Profesional": Este modelo tendría campos como nombre, 
+información de contacto, servicio, horarios disponibles 
+y la fecha en que comenzó a trabajar. 
 
-# Create your models here.
+"""
+
+class Professional(models.Model):
+    professional = models.CharField(max_length=255)
+    services = models.ManyToManyField(Service)
+    start_date = models.DateField()
+
+
+    
