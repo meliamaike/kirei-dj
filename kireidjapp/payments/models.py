@@ -1,22 +1,38 @@
 from django.db import models
-from reservations import Reservation, Customer
+from reservations import Reservation
 from products import Product
 from services import Service
+from . import Payment
+from customers import Customer
 
 
 """
     Modelo "Pago": Este modelo tendría campos como monto, fecha, 
-    forma de pago, y reserva de la cita asociada.Tendría relaciones:
-
-    Uno a uno con el modelo "Cita"
-    Uno a uno con el modelo "Factura"
+    forma de pago, y reserva de la cita asociada.
 """
     
 class Payment(models.Model):
     amount = models.DecimalField(max_digits=6, decimal_places=2)
     date = models.DateTimeField(auto_now_add=True)
-    payment_method = models.CharField(max_length=255)
     reservation = models.ForeignKey(Reservation, on_delete=models.CASCADE)
+    transaction_id = models.CharField(max_length=255, unique=True)
+    PAYMENT_METHOD = (
+    ('credit_card', 'Tarjeta de crédito'),
+    ('debit_card', 'Tarjeta de débito'),
+    ('cash', 'Efectivo'),
+    ('bank_transfer', 'Transferencia bancaria'),
+    ('mercado_pago', 'Mercado Pago'),
+    ('other', 'Otro'),
+)
+    payment_method = models.CharField(max_length=255, choices=PAYMENT_METHOD)
+    PAYMENT_STATUS = (
+    ('pending', 'Pendiente'),
+    ('success', 'Exitosa'),
+    ('failed', 'Fallida'),
+    ('refunded', 'Reembolsada'),
+    ('cancelled', 'Cancelada'),
+)
+    status = models.CharField(max_length=255, choices=PAYMENT_STATUS)
 
 """
     Modelo "Factura": Este modelo tendría campos como fecha, 
@@ -25,8 +41,8 @@ class Payment(models.Model):
 """
 
 class Bill(models.Model):
-    date = models.DateTimeField(auto_now_add=True)
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
     products = models.ManyToManyField(Product)
     services = models.ManyToManyField(Service)
     total_amount = models.DecimalField(max_digits=6, decimal_places=2)
+    payment = models.OneToOneField(Payment, on_delete=models.CASCADE)

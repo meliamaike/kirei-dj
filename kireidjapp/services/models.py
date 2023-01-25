@@ -14,7 +14,7 @@ Relaciones:
 class Service(models.Model):
     service = models.CharField(max_length = 200)
     description = models.TextField(verbose_name="Product Description")
-    duration = models.IntegerField(default=0)
+    duration = models.DurationField()
     price = models.DecimalField(max_digits=6, decimal_places=2)
 
     def __str__(self):
